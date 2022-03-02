@@ -1,7 +1,7 @@
 from discord.ext.commands import Bot
 
-from .cog import MyCog
+from .cog import Detector
 
 
 def setup(bot: Bot):
-    bot.add_cog(MyCog(bot))
+    bot.add_cog(Detector(bot))

@@ -39,7 +39,7 @@ class GhostDetector(commands.Bot):
             description=config.description
         )
 
-        self.load_extension('ghost_detector.my_extension')
+        self.load_extension('ghost_detector.detector')
 
     async def on_connect(self):
         logger.info('Client connected')
