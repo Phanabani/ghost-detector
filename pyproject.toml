@@ -8,6 +8,7 @@ authors = ["Phanabani <phanabani@gmail.com>"]
 python = "^3.9.6"
 discord = "^1.7.0"
 pydantic = "^1.9.0"
+python-slugify = "^6.1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
