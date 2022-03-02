@@ -10,6 +10,7 @@ A Discord bot that will help you find inactive users in your server.
 - [Install](#install)
 - [Usage](#usage)
 - [Config](#config)
+- [Commands](#commands)
 - [Developers](#developers)
 - [License](#license)
 
@@ -97,6 +98,10 @@ field.
 
 See [Config](docs/config.md) for detailed information about setting up the
 config file.
+
+## Commands
+
+See [Commands](docs/commands.md) for info about Ghost Detector's commands.
 
 ## Developers
 
