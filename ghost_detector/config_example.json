@@ -1,0 +1,16 @@
+{
+    "bot_token": "YOUR_BOT_TOKEN",
+    "bot": {
+        "command_prefix": "!ghosts",
+        "description": "A Discord bot that will help you find inactive users in your server."
+    },
+    "logging": {
+        "happy_bot_logging_level": "INFO",
+        "discord_logging_level": "WARNING",
+        "output_file": "./logs/ghost_detector.log",
+        "when": "midnight",
+        "interval": 1,
+        "backup_count": 7,
+        "format": "%(asctime)s %(levelname)s %(name)s | %(message)s"
+    }
+}
