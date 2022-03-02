@@ -132,10 +132,12 @@ class Detector(commands.Cog):
                         # User left the server
                         continue
                     msg: discord.Message
-                    if users[msg.author].msg_count < max_count:
+                    user_info = users[msg.author]
+                    if user_info.msg_count < max_count:
                         # Only count up to the max for privacy reasons
-                        users[msg.author].msg_count += 1
-                    users[msg.author].last_msg_date = msg.created_at
+                        user_info.msg_count += 1
+                    if msg.created_at > user_info.last_msg_date:
+                        user_info.last_msg_date = msg.created_at
 
             except Exception as e:
                 logger.error(
