@@ -86,6 +86,8 @@ Ghost Detector requires the following permissions to run normally:
 - Attach files
 - Read message history
 
+Permissions integer: `274878024704`
+
 ## Config
 
 Ghost Detector can be configured with a JSON file at `ghost_detector/config.json`.
