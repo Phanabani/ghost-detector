@@ -91,15 +91,18 @@ class Detector(commands.Cog):
         for member, info in ghost_users:
             if info.msg_count == max_count:
                 continue
-            csv_writer.writerow([
-                f'{member.name}#{member.discriminator}',
-                member.id,
-                member.display_name,
-                info.msg_count,
-                member.joined_at,
-                info.last_msg_date,
-                ', '.join(sorted(r.name for r in member.roles if r.name != '@everyone'))
-            ])
+            try:
+                csv_writer.writerow([
+                    f'{member.name}#{member.discriminator}',
+                    member.id,
+                    member.display_name,
+                    info.msg_count,
+                    member.joined_at,
+                    info.last_msg_date,
+                    ', '.join(sorted(r.name for r in member.roles if r.name != '@everyone'))
+                ])
+            except Exception as e:
+                logger.error(f"Error while writing CSV row for user {member}", exc_info=e)
 
         csv_stream.seek(0)
         return csv_stream
