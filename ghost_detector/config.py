@@ -27,7 +27,7 @@ def maybe_relative_path(path: Union[Path, str]):
 
 
 class ConfigBot(BaseModel):
-    command_prefix: str = '!ghosts'
+    command_prefix: str = '!ghosts '
     description: str = 'A Discord bot that will help you find inactive users in your server.'
 
 
