@@ -22,7 +22,8 @@ class GhostDetector(commands.Bot):
 
         intents = discord.Intents(
             guilds=True,
-            members=True
+            members=True,
+            messages=True
         )
         allowed_mentions = discord.AllowedMentions(users=True)
         activity = discord.Game(f'{config.command_prefix}help')
