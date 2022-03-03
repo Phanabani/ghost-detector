@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import datetime as dt
 from io import StringIO
 import logging
-from typing import Literal, Optional, cast
+from typing import Literal, Optional, TextIO, cast
 
 import discord
 from discord import Member
@@ -73,39 +73,50 @@ class Detector(commands.Cog):
                 channels.append(channel)
         return channels
 
+    def _create_csv(
+            self, users: dict[Member, UserInfo], max_count: int
+    ) -> tuple[TextIO, TextIO]:
+        """
+        :return: a tuple of CSV text streams of (pruned_users, all_users)
+        """
+        def write_row(writer: csv.writer, member: Member, info: UserInfo):
+            writer.writerow([
+                f'{member.name}#{member.discriminator}',
+                member.id,
+                member.display_name,
+                info.msg_count,
+                member.joined_at,
+                info.last_msg_date,
+                ', '.join(sorted(r.name for r in member.roles if r.name != '@everyone'))
+            ])
 
-    def _create_csv(self, users: dict[Member, UserInfo], max_count: int):
         ghost_users = cast(
             list[tuple[Member, UserInfo]],
             sorted(list(users.items()), key=lambda u: u[0].name)
         )
 
-        csv_stream = StringIO()
-        csv_writer = csv.writer(csv_stream)
-        csv_writer.writerow(
-            ['user', 'id', 'nickname',
-             'message_count',
-             'joined_at', 'last_message_date',
-             'roles']
-        )
+        cols = [
+            'user', 'id', 'nickname', 'message_count', 'joined_at',
+            'last_message_date', 'roles'
+        ]
+        csv_pruned_stream = StringIO()
+        csv_pruned_writer = csv.writer(csv_pruned_stream)
+        csv_pruned_writer.writerow(cols)
+        csv_all_stream = StringIO()
+        csv_all_writer = csv.writer(csv_all_stream)
+        csv_all_writer.writerow(cols)
+
         for member, info in ghost_users:
-            if info.msg_count == max_count:
-                continue
             try:
-                csv_writer.writerow([
-                    f'{member.name}#{member.discriminator}',
-                    member.id,
-                    member.display_name,
-                    info.msg_count,
-                    member.joined_at,
-                    info.last_msg_date,
-                    ', '.join(sorted(r.name for r in member.roles if r.name != '@everyone'))
-                ])
+                write_row(csv_all_writer, member, info)
+                if info.msg_count != max_count:
+                    write_row(csv_pruned_writer, member, info)
             except Exception as e:
                 logger.error(f"Error while writing CSV row for user {member}", exc_info=e)
 
-        csv_stream.seek(0)
-        return csv_stream
+        csv_pruned_stream.seek(0)
+        csv_all_stream.seek(0)
+        return csv_pruned_stream, csv_all_stream
 
     @commands.command()
     @commands.has_guild_permissions(manage_guild=True)
@@ -150,9 +161,11 @@ class Detector(commands.Cog):
 
         await progress.update()
 
-        csv = self._create_csv(users, max_count)
-        filename = (
-            f'GhostUsers_{slugify(context.guild.name, separator="_", lowercase=False)}'
-            f'_{dt.datetime.utcnow().strftime("%Y%m%d_%H%M")}.csv'
-        )
-        await context.send(file=discord.File(csv, filename))
+        pruned_csv, all_csv = self._create_csv(users, max_count)
+        guild_slug = slugify(context.guild.name, separator="_", lowercase=False)
+        now_ts = dt.datetime.utcnow().strftime("%Y%m%d_%H%M")
+        files = [
+            discord.File(pruned_csv, f'GhostUsers_{guild_slug}_{now_ts}_PRUNED.csv'),
+            discord.File(all_csv, f'GhostUsers_{guild_slug}_{now_ts}_ALL.csv')
+        ]
+        await context.send(files=files)
